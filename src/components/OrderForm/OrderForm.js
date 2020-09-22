@@ -1,23 +1,48 @@
 import React, { Component } from 'react';
 
+import { postOrder } from '../../apiCalls'
+
 class OrderForm extends Component {
   constructor(props) {
     super();
     this.props = props;
     this.state = {
       name: '',
-      ingredients: []
+      ingredients: [],
+      isFormValid: false
     };
   }
+  handleIngredientChange = e => {
+    e.preventDefault();
+    const burritoIngredients = [...this.state.ingredients] || [];
+    burritoIngredients.push(e.target.name)
+    this.setState({ingredients: burritoIngredients});
+  }
 
+  handleNameChange = e => {
+    this.setState({name: e.target.value})
+  }
 
   handleSubmit = e => {
     e.preventDefault();
-    this.clearInputs();
+    this.formValidation()
+    if (this.state.isFormValid) {
+    postOrder({name: this.state.name, ingredients: this.state.ingredients});
+    this.clearInputs() 
+    this.setState({isFormValid: false})
+    }
   }
 
   clearInputs = () => {
     this.setState({name: '', ingredients: []});
+  }
+
+  formValidation = () => {
+    if (this.state.ingredients.length > 0 && this.state.name.length > 0) {
+      this.setState({isFormValid: true})
+    } else {
+      this.setState({isFormValid: false})
+    }
   }
 
   render() {
